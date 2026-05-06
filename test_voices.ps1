@@ -1,19 +1,20 @@
 # test_voices.ps1
-# Runs Chatterbox Turbo through 8 personality variations so you can A/B them.
+# Runs Chatterbox Turbo through 8 personality variations.
 # Each call saves a numbered WAV to the current folder.
 #
-# Usage:
-#   1. Edit the URL and tokens below
-#   2. Run: .\test_voices.ps1
-#   3. Listen to all 8 WAVs in order, pick favorites for Kai
+# Usage: powershell -ExecutionPolicy Bypass -File .\test_voices.ps1
 
-# ============================================================
-# CONFIG — edit these three values
-# ============================================================
-$URL = "https://agencympire--chatterbox-turbo-chatterboxturboservice-generate.modal.run"
-$KEY = "REDACTED"
-$SECRET = "REDACTED"
-# ============================================================
+# Load secrets from .env
+. .\load_env.ps1
+
+$URL = $env:MODAL_URL_TURBO
+$KEY = $env:MODAL_KEY
+$SECRET = $env:MODAL_SECRET
+
+if (-not $URL -or -not $KEY -or -not $SECRET) {
+    Write-Host "ERROR: Missing env vars. Make sure .env exists with MODAL_URL_TURBO, MODAL_KEY, MODAL_SECRET" -ForegroundColor Red
+    exit 1
+}
 
 $headers = @{
     "Modal-Key"    = $KEY
@@ -21,7 +22,6 @@ $headers = @{
     "Content-Type" = "application/json"
 }
 
-# Each test: name, text, exaggeration, cfg_weight
 $tests = @(
     @{
         Name = "01_neutral_baseline"

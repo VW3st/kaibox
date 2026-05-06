@@ -2,29 +2,28 @@
 kai_play.py
 Streams Chatterbox audio from Modal and plays it on speakers as bytes arrive.
 
+Setup:
+    pip install requests sounddevice numpy python-dotenv
+    Copy .env.example to .env and fill in your tokens.
+
 Usage:
     python kai_play.py "Hey what's up chat, this is Kai speaking live."
-    python kai_play.py "Whatever you want Kai to say."
-
-First call: ~1.5s before audio starts (warm container)
-Cold call:  ~30-60s before audio starts
-
-Edit the CONFIG section below with your URL and tokens.
+    python kai_play.py
 """
 
+import os
 import sys
 import requests
 import numpy as np
 import sounddevice as sd
+from dotenv import load_dotenv
 
-# ============================================================
-# CONFIG
-# ============================================================
-URL = "https://agencympire--chatterbox-tts-streaming-chatterboxstreamin-6d5dad.modal.run"
-KEY = "REDACTED"
-SECRET = "REDACTED"
-SAMPLE_RATE = 24000   # Chatterbox native sample rate
-# ============================================================
+load_dotenv()
+
+URL = os.environ["MODAL_URL_STREAMING"]
+KEY = os.environ["MODAL_KEY"]
+SECRET = os.environ["MODAL_SECRET"]
+SAMPLE_RATE = 24000
 
 
 def stream_and_play(text: str, exaggeration: float = 0.7, cfg_weight: float = 0.4):
@@ -43,16 +42,14 @@ def stream_and_play(text: str, exaggeration: float = 0.7, cfg_weight: float = 0.
     print(f"Sending: {text[:80]}{'...' if len(text) > 80 else ''}")
     print("Waiting for first chunk...")
 
-    # Open a streaming connection
     with requests.post(URL, headers=headers, json=body, stream=True, timeout=120) as r:
         r.raise_for_status()
 
-        # Open the audio output stream
         stream = sd.OutputStream(
             samplerate=SAMPLE_RATE,
             channels=1,
             dtype="int16",
-            blocksize=0,           # auto
+            blocksize=0,
             latency="low",
         )
         stream.start()
@@ -80,11 +77,13 @@ def stream_and_play(text: str, exaggeration: float = 0.7, cfg_weight: float = 0.
                     if not raw:
                         continue
 
-                # Convert raw bytes to int16 samples and play
                 # Make sure we have an even number of bytes (int16 = 2 bytes)
                 if len(raw) % 2 != 0:
-                    leftover = raw[-1:]
+                    leftover_byte = raw[-1:]
                     raw = raw[:-1]
+                    if leftover:
+                        raw = leftover + raw
+                    leftover = leftover_byte
                 else:
                     if leftover:
                         raw = leftover + raw

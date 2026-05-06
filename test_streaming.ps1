@@ -6,15 +6,19 @@
 #
 # Usage: powershell -ExecutionPolicy Bypass -File .\test_streaming.ps1
 
-# ============================================================
-# CONFIG
-# ============================================================
-$URL = "https://agencympire--chatterbox-tts-streaming-chatterboxstreamin-6d5dad.modal.run"
-$KEY = "REDACTED"
-$SECRET = "REDACTED"
+# Load secrets from .env
+. .\load_env.ps1
+
+$URL = $env:MODAL_URL_STREAMING
+$KEY = $env:MODAL_KEY
+$SECRET = $env:MODAL_SECRET
 $TEXT_FILE = ".\podcast.txt"
 $OUTPUT = ".\podcast_streaming.wav"
-# ============================================================
+
+if (-not $URL -or -not $KEY -or -not $SECRET) {
+    Write-Host "ERROR: Missing env vars. Make sure .env exists with MODAL_URL_STREAMING, MODAL_KEY, MODAL_SECRET" -ForegroundColor Red
+    exit 1
+}
 
 if (-not (Test-Path $TEXT_FILE)) {
     Write-Host "ERROR: $TEXT_FILE not found in current folder" -ForegroundColor Red
@@ -31,7 +35,6 @@ $body = @{
     chunk_size   = 25
 } | ConvertTo-Json -Compress
 
-# Use HttpClient for true streaming (Invoke-WebRequest buffers the whole response)
 Add-Type -AssemblyName System.Net.Http
 
 $client = [System.Net.Http.HttpClient]::new()
