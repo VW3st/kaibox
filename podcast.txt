@@ -1,0 +1,11 @@
+Hey what's up everyone, welcome back to the show. So today I want to talk about something that's been completely melting my brain over the last few weeks, and that is open source AI voice models.
+
+Here's the wild part. Two years ago, if you wanted a voice that sounded actually human, you had to pay companies like ElevenLabs or Resemble per character. And the second you stopped paying, your voice was gone. You were renting it.
+
+Fast forward to today, and you have models like Chatterbox. Free. MIT licensed. Runs on your own hardware. And it sounds, honestly, ninety percent as good as the paid stuff. In some cases I think it sounds better, because you can clone any voice you want with a five second clip.
+
+The implications here are massive. Think about it. Every podcast, every YouTube video, every game, every audiobook, every customer service line, all of that is powered by voice. And we're about to flip from renting your voice from a company, to owning your voice forever.
+
+The catch, because there's always a catch, is latency. The challenge with self-hosted is making it stream fast enough to feel like a real conversation. That's the bottleneck nobody talks about. And that's exactly what we're testing today.
+
+So if this thing actually works the way I'm hoping, we'll know in about two minutes. Let's see what happens.

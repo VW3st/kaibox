@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.wav
+body.json
+.env
+secrets.ps1
