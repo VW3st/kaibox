@@ -4,3 +4,10 @@ __pycache__/
 body.json
 .env
 secrets.ps1
+# Audio outputs from testing
+*.wav
+*.mp3
+
+# But DO commit reference voice files
+!voices/*.wav
+!voices/*.mp3
