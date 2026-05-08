@@ -11,3 +11,5 @@ secrets.ps1
 # But DO commit reference voice files
 !voices/*.wav
 !voices/*.mp3
+!voices/training/*.wav
+!voices/*.png
