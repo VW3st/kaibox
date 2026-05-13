@@ -40,7 +40,18 @@ model_cache = modal.Volume.from_name("chatterbox-cache", create_if_missing=True)
     gpu="A10G",
     volumes={"/cache": model_cache},
     scaledown_window=300,
-    min_containers=0,
+    # Keep ONE container warm continuously. With min_containers=0 the
+    # container scales to zero during quiet periods (long Q&A pauses,
+    # producer beat gaps, chat lulls) and the next TTS call eats a
+    # ~25-30s cold-start. Mid-show that lands as a 25s audio gap in
+    # the broadcast (chatterbox -> bridge -> browser -> musetalk-hls
+    # is a strict pipeline; any link stalling stalls the whole
+    # stream). Pinning min=1 costs ~$1.10/hr while warm; for a 30 min
+    # show that's $0.55 of insurance against the gap.
+    # The @modal.concurrent(max_inputs=4) below keeps four-way
+    # parallelism within the single warm container, so throughput
+    # for bursty sentence batches stays high.
+    min_containers=1,
 )
 @modal.concurrent(max_inputs=4)
 class ChatterboxTurboService:
